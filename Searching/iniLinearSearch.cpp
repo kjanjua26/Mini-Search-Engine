@@ -14,7 +14,7 @@ int main() {
         clock_t start = clock();
         while ( getline (myfile,line)){
             // converting line to c-style strings to compare.
-            if(strcmp(line.c_str(), "August") == 0){ // Checks if the word April is in the file, if so, it prints it.
+            if(strcmp(line.c_str(), "August") == 0){ // Checks if the word is in the file, if so, it prints it.
                 cout << line << endl;
                 clock_t end = clock();
                 double time = (double) (end-start) / CLOCKS_PER_SEC * 1000.0;
