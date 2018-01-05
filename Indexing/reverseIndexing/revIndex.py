@@ -15,7 +15,7 @@ class HashTable:
 
     def getKeys(self, textLine):
         gFile = self.cleargrammer()
-        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine)
+        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine) #replaces the non-ASCII values with *
         line = line.split()
         line = [x for x in line if x not in gFile]  # eliminate the articles, prepositions etc.
         return line
@@ -51,8 +51,8 @@ class HashTable:
             for val in hitList[key]:
                 docID = val[0]
                 occurence = val[1]
-                temp.append(':'.join([str(docID) ,','.join(map(str,occurence))]))
-                f.write(''.join((key,'|',';'.join(temp))))
+                temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
+                f.write(''.join((key,'|','->'.join(temp))))
         f.close()
 
     def readFiles(self):
@@ -68,7 +68,7 @@ class HashTable:
         data = self.parse()
         while data != {}:
             line = '\n'.join((data['title'], data['text']))  # joining text and title
-            keys = self.getTerms(line)
+            keys = self.getKeys(line)
             invertedIndex = {}
             pID = int(data['id'])
             for value, key in enumerate(keys):
