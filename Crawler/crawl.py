@@ -1,9 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 from collections import defaultdict
-import zlib
+import zlib # to compress.
 
 class Parse:
+    keyword = ['Nelson Mandela', 'Cricket']
     count = 0
     articleList = defaultdict(list)
 
@@ -11,12 +12,19 @@ class Parse:
         pass
 
     def fileNames(self):
-        self.outputFile = "ouput.dat"
+        self.outputFile = "output.dat"
 
-    def writeFile(self, text):
+    def writeFile(self):
         file = open(self.outputFile, 'w')
-        file.write("<parseRoot>") # first root.
-
+        file.write("<parseRoot>\n")  # first root.
+        for key in self.articleList:
+            file.write("<page>\n")
+            file.write("<id>{}</id>\n".format(key))
+            file.write("<title>{}</title>\n".format(self.keyword[key-1]))
+            file.write('<text xml:space="preserve">')
+            file.write(self.articleList[key])
+            file.write("</text>")
+            file.write("</page>\n")
         file.write("</parseRoot>")
         file.close()
 
@@ -29,15 +37,14 @@ class Parse:
         for i in parser_tag:
             self.articleList[self.count] = i.text.encode('utf-8')
 
-    def compressData(self): #compressing the text in the hashtable.
+    def compressData(self): # compressing the text in the hashtable.
         for key in self.articleList.iterkeys():
             self.articleList[key] = zlib.compress(self.articleList[key])
 
 if __name__ == '__main__':
     instance = Parse() #creating object of class.
-    keyword = ['Nelson Mandela', 'Cricket']
-    for i in keyword:
+    for i in instance.keyword:
         url = "https://simple.wikipedia.org/wiki/{}".format(i)
         instance.getData(url)
     instance.compressData()
-    print instance.articleList
+    instance.writeFile()
