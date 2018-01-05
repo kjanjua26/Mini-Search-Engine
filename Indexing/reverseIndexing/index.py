@@ -2,8 +2,7 @@ import re
 from collections import defaultdict
 from array import array
 
-hitList = defaultdict(list)
-
+hitList = defaultdict(list) #the hitList -> word occurence and positon w.r.t docID.
 
 class HashTable:
     def __init__(self):
@@ -48,13 +47,13 @@ class HashTable:
 
     def writeIndexToFile(self):
         f = open(self.indexFile, 'w')
-        for term in hitList.iterkeys():
-            postinglist = []
-            for p in hitList[term]:
-                docID = p[0]
-                positions = p[1]
-                postinglist.append(':'.join([str(docID) ,','.join(map(str,positions))]))
-                print >> f, ''.join((term,'|',';'.join(postinglist)))
+        for key in hitList.iterkeys():
+            temp = []
+            for val in hitList[key]:
+                docID = val[0]
+                positions = val[1]
+                temp.append(':'.join([str(docID) ,','.join(map(str,positions))]))
+                f.write(''.join((key,'|',';'.join(temp))))
         f.close()
 
     def readFiles(self):
@@ -80,11 +79,11 @@ class HashTable:
                     invertedIndex[key] = [pID, array('I', [value])]  # hashtable[id, [ArrayList]]
 
             for curPage, invPag in invertedIndex.iteritems():
-                hitList[curPage].append(invPag)  # updates the hashtable with each new page.
+                hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
             data = self.parse()  # repeat for next page.
         self.writeIndexToFile()
 
 
 if __name__ == "__main__":
     invIndex = HashTable()
-    invIndex.createhashtable() #calling the method
+    invIndex.createhashtable()
