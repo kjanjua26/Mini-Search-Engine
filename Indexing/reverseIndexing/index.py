@@ -1,4 +1,3 @@
-
 import re
 from collections import defaultdict
 from array import array
@@ -81,13 +80,11 @@ class HashTable:
                     invertedIndex[key] = [pID, array('I', [value])]  # hashtable[id, [ArrayList]]
 
             for curPage, invPag in invertedIndex.iteritems():
-                hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
+                hitList[curPage].append(invPag)  # updates the hashtable with each new page.
             data = self.parse()  # repeat for next page.
         self.writeIndexToFile()
 
 
 if __name__ == "__main__":
     invIndex = HashTable()
-    invIndex.createhashtable()
-
-
+    invIndex.createhashtable() #calling the method
