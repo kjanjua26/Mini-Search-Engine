@@ -45,7 +45,7 @@ class HashTable:
         return cache
 
     def writeFile(self):
-        f = open(self.indexFile, 'w')
+        f = open(self.outputFile, 'w')
         for key in hitList.iterkeys():
             temp = []
             for val in hitList[key]:
@@ -56,9 +56,9 @@ class HashTable:
         f.close()
 
     def readFiles(self):
-        self.filename = "/Users/Janjua/Desktop/BSCS/3rd Semester/DSA/Project/test.da"
-        self.grammerFile = "/Users/Janjua/Desktop/BSCS/3rd Semester/DSA/Project/grammer.dat"
-        self.indexFile = "/Users/Janjua/Desktop/BSCS/3rd Semester/DSA/Project/pyIndexer/Index.dat"
+        self.filename = "" #input wikipedia file
+        self.grammerFile = "" #grammer file to remove the articles, prepositions etc.
+        self.outputFile = "" #name of output file
 
     def createhashtable(self):
         self.readFiles()
