@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 from array import array
 
-hitList = defaultdict(list) #the hitList -> word occurence and positon w.r.t docID.
+hitList = defaultdict(list)
 
 class HashTable:
     def __init__(self):
@@ -10,15 +10,14 @@ class HashTable:
 
     def cleargrammer(self):
         gFile = open(self.grammerFile, 'r')
-        grammerDoc = [line.strip('\n') for line in gFile]  # gets the list of the grammerFile we want to clear.
+        grammerDoc = [line.strip('\n') for line in gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
         return grammerDoc
 
-    def getTerms(self, line):
-        sw = self.cleargrammer()
-        line = line.lower()
-        line = re.sub('[^0-9a-zA-Z]+', ' ', line)
+    def getKeys(self, textLine):
+        gFile = self.cleargrammer()
+        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine)
         line = line.split()
-        line = [x for x in line if x not in sw]  # eliminate the stopwords
+        line = [x for x in line if x not in gFile]  # eliminate the articles, prepositions etc.
         return line
 
     def parse(self):
@@ -45,14 +44,14 @@ class HashTable:
         print "Done!"
         return cache
 
-    def writeIndexToFile(self):
+    def writeFile(self):
         f = open(self.indexFile, 'w')
         for key in hitList.iterkeys():
             temp = []
             for val in hitList[key]:
                 docID = val[0]
-                positions = val[1]
-                temp.append(':'.join([str(docID) ,','.join(map(str,positions))]))
+                occurence = val[1]
+                temp.append(':'.join([str(docID) ,','.join(map(str,occurence))]))
                 f.write(''.join((key,'|',';'.join(temp))))
         f.close()
 
@@ -81,7 +80,7 @@ class HashTable:
             for curPage, invPag in invertedIndex.iteritems():
                 hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
             data = self.parse()  # repeat for next page.
-        self.writeIndexToFile()
+        self.writeFile()
 
 
 if __name__ == "__main__":
