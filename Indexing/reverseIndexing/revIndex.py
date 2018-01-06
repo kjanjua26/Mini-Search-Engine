@@ -7,7 +7,9 @@ textList = []
 
 class HashTable:
     def __init__(self):
-        pass
+        self.filename = "" # input file.
+        self.grammerFile = "" # grammer file to clear articles, preposition
+        self.indexFile = "" # output file name
 
     def cleargrammer(self):
         gFile = open(self.grammerFile, 'r')
@@ -47,11 +49,6 @@ class HashTable:
                 f.write(''.join((key,'|',';'.join(temp))))
         f.close()
 
-    def readFiles(self):
-        self.filename = "" # input file.
-        self.grammerFile = "" # grammer file to clear articles, preposition
-        self.indexFile = "" # output file name
-
     def createhashtable(self):
         self.readFiles()
         self.wikiFile = self.filename
@@ -68,9 +65,9 @@ class HashTable:
                     invertedIndex[key] = [pID, array('I', [value])]  # hashtable[id, [ArrayList]]
             for curPage, invPag in invertedIndex.iteritems():
                 hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
-            print "Done Doc ID: ", pID
+            print("Done Doc ID: ", pID)
         self.writeFile()
 
 if __name__ == "__main__":
-    invIndex = HashTable()
+    invIndex = HashTable('','grammer.rtf','')
     invIndex.createhashtable()
