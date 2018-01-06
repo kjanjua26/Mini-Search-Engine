@@ -1,8 +1,9 @@
 import re
 from collections import defaultdict
 from array import array
-
+from bs4 import BeautifulSoup as BS
 hitList = defaultdict(list)
+textList = []
 
 class HashTable:
     def __init__(self):
@@ -15,73 +16,60 @@ class HashTable:
 
     def getKeys(self, textLine):
         gFile = self.cleargrammer()
-        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine) #replaces the non-ASCII values with *
+        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine) #replaces the non-ASCII values with space
         line = line.split()
         line = [x for x in line if x not in gFile]  # eliminate the articles, prepositions etc.
         return line
 
     def parse(self):
-        # |$ to get just the first match.
-        regex = ['<title>(.*?)</title>', '<id>(.*?)</id>|$', '<text xml:space="preserve">(.*?)</text>']  # tags to parse
-        wiki = self.wikiFile
+        self.readFiles()
+        regex = ['<title>(.*?)</title>', '<id>(.*?)</id>|$', '<text xml:space="preserve">(.*?)</text>', '<text>(.*?)</text>']  # tags to parse
+        wiki = open(self.filename, 'r')
         pageList = []
         for line in wiki:
-            if line != "</page>\n":
+            if line != "</page>":
                 pageList.append(line)
             else:
                 break
         simplewiki = ''.join(pageList)
-        pTitle = re.search(regex[0], simplewiki, re.DOTALL)
-        pText = re.search(regex[2], simplewiki, re.DOTALL)
-        pID = re.search(regex[1], simplewiki, re.DOTALL)
-        if pTitle == None or pText == None or pID == None:
-            return {}
-        cache = {}
-        print "Creating hashtable!"
-        cache['title'] = pTitle.group(1)
-        cache['text'] = pText.group(1)
-        cache['id'] = pID.group(1)
-        print "Done!"
-        return cache
+        soup = BS(simplewiki, 'html.parser')
+        for i in soup.findAll('text'):
+           textList.append(i.text)
 
     def writeFile(self):
-        f = open(self.outputFile, 'w')
+        f = open(self.indexFile, 'w')
         for key in hitList.iterkeys():
             temp = []
             for val in hitList[key]:
                 docID = val[0]
                 occurence = val[1]
                 temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
-                f.write(''.join((key,'|','->'.join(temp))))
+                f.write(''.join((key,'|',';'.join(temp))))
         f.close()
 
     def readFiles(self):
-        self.filename = "" #input wikipedia file
-        self.grammerFile = "" #grammer file to remove the articles, prepositions etc.
-        self.outputFile = "" #name of output file
+        self.filename = "" # input file.
+        self.grammerFile = "" # grammer file to clear articles, preposition
+        self.indexFile = "" # output file name
 
     def createhashtable(self):
         self.readFiles()
-        self.wikiFile = open(self.filename, 'r')
+        self.wikiFile = self.filename
+        self.parse()
         self.cleargrammer()
-        data = {}
-        data = self.parse()
-        while data != {}:
-            line = '\n'.join((data['title'], data['text']))  # joining text and title
-            keys = self.getKeys(line)
+        for i in range(len(textList)):
+            keys = self.getKeys(textList[i])
             invertedIndex = {}
-            pID = int(data['id'])
+            pID = i+1
             for value, key in enumerate(keys):
                 try:
                     invertedIndex[key][1].append(value)
                 except:
                     invertedIndex[key] = [pID, array('I', [value])]  # hashtable[id, [ArrayList]]
-
             for curPage, invPag in invertedIndex.iteritems():
                 hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
-            data = self.parse()  # repeat for next page.
+            print "Done Doc ID: ", pID
         self.writeFile()
-
 
 if __name__ == "__main__":
     invIndex = HashTable()
