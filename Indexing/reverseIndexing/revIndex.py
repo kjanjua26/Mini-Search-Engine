@@ -53,9 +53,9 @@ class HashTable:
         myFile.close()
         
     def readFiles(self):
+        self.filename = "simplewiki.dat"
         self.csvFile = "data.csv"
-        self.grammerFile = "/Users/Janjua/Desktop/BSCS/3rd Semester/DSA/Project/pyIndexer/grammer.dat"
-        self.indexFile = "/Users/Janjua/Desktop/BSCS/3rd Semester/DSA/Project/pyIndexer/output.dat"
+        self.grammerFile = "grammer.dat"
 
     def createhashtable(self):
         self.readFiles()
