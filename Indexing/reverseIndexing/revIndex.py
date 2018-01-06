@@ -2,14 +2,16 @@ import re
 from collections import defaultdict
 from array import array
 from bs4 import BeautifulSoup as BS
+import csv
+
 hitList = defaultdict(list)
 textList = []
 
 class HashTable:
-    def __init__(self):
-        self.filename = "" # input file.
-        self.grammerFile = "" # grammer file to clear articles, preposition
-        self.indexFile = "" # output file name
+    def __init__(self, source, grammerFile, output):
+        self.filename = source
+        self.csvFile = output
+        self.grammerFile = grammerFile
 
     def cleargrammer(self):
         gFile = open(self.grammerFile, 'r')
@@ -24,7 +26,6 @@ class HashTable:
         return line
 
     def parse(self):
-        self.readFiles()
         regex = ['<title>(.*?)</title>', '<id>(.*?)</id>|$', '<text xml:space="preserve">(.*?)</text>', '<text>(.*?)</text>']  # tags to parse
         wiki = open(self.filename, 'r')
         pageList = []
@@ -39,18 +40,22 @@ class HashTable:
            textList.append(i.text)
 
     def writeFile(self):
-        f = open(self.indexFile, 'w')
+        myFile = open(self.csvFile, 'w')
+        myFile.write('Key, DocIDs')
+        myFile.write('\n')
         for key in hitList.iterkeys():
             temp = []
             for val in hitList[key]:
                 docID = val[0]
                 occurence = val[1]
                 temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
-                f.write(''.join((key,'|',';'.join(temp))))
-        f.close()
+                inStr = ''.join(temp)
+                myFile.write(key+","+str(inStr)+"\n")
+        myFile.close()
+        
+        
 
     def createhashtable(self):
-        self.readFiles()
         self.wikiFile = self.filename
         self.parse()
         self.cleargrammer()
@@ -69,5 +74,5 @@ class HashTable:
         self.writeFile()
 
 if __name__ == "__main__":
-    invIndex = HashTable('','grammer.rtf','')
+    invIndex = HashTable("simplewiki.dat", "grammer.rtf", "data.csv")
     invIndex.createhashtable()
