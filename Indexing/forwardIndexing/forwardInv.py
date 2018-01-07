@@ -1,80 +1,46 @@
 import re
-from collections import defaultdict
-from array import array
-from bs4 import BeautifulSoup as BS
+from collections import defaultdict, OrderedDict
 
-hitList = defaultdict(list)
-textList = []
+grammerFile = 'grammer.dat'
 
-class HashTable:
+class ForwardIndex:
     def __init__(self):
         pass
 
-    def cleargrammer(self):
-        gFile = open(self.grammerFile, 'r')
-        grammerDoc = [line.strip('\n') for line in gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
-        return grammerDoc
+    hitlist = defaultdict(list)
+    strArr = ['Hello', 'How are you', 'Kamran Janjua',
+              'Mandela was a great leader. He revolunized the whole South Africa',
+              'I love Mandela, he was a great leader',
+              'Cricket is the best game in England.',
+              'The most important month of the year is April, April is important.',
+              'This string contains duplicates. This string contains duplicates. This string contains DUPLICATES',
+              'ANOTHER TEST DOCUMENT, SEEEEEEEEEEEEH HOW THIS WORKS',
+              'The CPU pushes the Flags Register onto the stack. The CPU pushes a far return address (segment: offset) onto the stack, segment value first. The CPU determines the cause of the interrupt (i.e., the interrupt vector number) and fetches the four byte interrupt vector from address 0:vector*4. The CPU transfers control to the routine specified by the interrupt vector table entry']
 
-    def getKeys(self, textLine):
+    def cleargrammer(self):
+        gFile = open(grammerFile, 'r')
+        grammerdoc = [line.strip('\n') for line in
+                      gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
+        return grammerdoc
+
+    def getkeys(self, textLine):
         gFile = self.cleargrammer()
-        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine) #replaces the non-ASCII values with space
+        line = re.sub('[^0-9a-zA-Z]+', ' ', textLine)  # replaces the non-ASCII values with space
+        line = line.lower()
         line = line.split()
         line = [x for x in line if x not in gFile]  # eliminate the articles, prepositions etc.
+        line = list(OrderedDict.fromkeys(line)) #remove duplicates.
         return line
 
-    def parse(self):
-        self.readFiles()
-        regex = ['<title>(.*?)</title>', '<id>(.*?)</id>|$', '<text xml:space="preserve">(.*?)</text>', '<text>(.*?)</text>']  # tags to parse
-        wiki = open(self.filename, 'r')
-        pageList = []
-        for line in wiki:
-            if line != "</page>":
-                pageList.append(line)
-            else:
-                break
-        simplewiki = ''.join(pageList)
-        soup = BS(simplewiki, 'html.parser')
-        for i in soup.findAll('text'):
-           textList.append(i.text)
-
-    def writeFile(self):
-        myFile = open(self.csvFile, 'w')
-        myFile.write('Key, DocIDs')
-        myFile.write('\n')
-        for key in hitList.iterkeys():
-            temp = []
-            for val in hitList[key]:
-                docID = val[0]
-                occurence = val[1]
-                temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
-                inStr = ';'.join(temp)
-                myFile.write(key+","+str(inStr)+"\n")
-        myFile.close()
-
-    def readFiles(self):
-        self.filename = "scrappedOut.dat"
-        self.csvFile = "data.csv"
-        self.grammerFile = "grammer.dat"
-
-    def createhashtable(self):
-        self.readFiles()
-        self.wikiFile = self.filename
-        self.parse()
-        self.cleargrammer()
-        for i in range(len(textList)):
-            keys = self.getKeys(textList[i])
-            invertedIndex = {}
+    def main(self):
+        for i in range(len(self.strArr)):
+            line = self.getkeys(self.strArr[i])
             pID = i+1
-            for value, key in enumerate(keys):
-                try:
-                    invertedIndex[key][1].append(value)
-                except:
-                    invertedIndex[key] = [pID, array('I', [value])]  # hashtable[id, [ArrayList]]
-            for curPage, invPag in invertedIndex.iteritems():
-                hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
-            print "Done Doc ID: ", pID
-        self.writeFile()
+            self.hitlist[pID] = line
+            print "Done DocID: ", pID
 
-if __name__ == "__main__":
-    invIndex = HashTable()
-    invIndex.createhashtable()
+if __name__ == '__main__':
+    fInd = ForwardIndex()
+    fInd.main()
+    for docID in fInd.hitlist.iterkeys():
+        print "Doc ID: ", docID, " ", "Words: ", fInd.hitlist[docID]
