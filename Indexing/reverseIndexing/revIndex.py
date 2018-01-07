@@ -26,7 +26,7 @@ class HashTable:
                 occurence = val[1]
                 temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
                 inStr = ';'.join(temp)
-                myFile.write(key+","+str(inStr)+"\n")
+            myFile.write(key+","+str(inStr)+"\n")
         myFile.close()
         
     def getKeys(self, textLine):
