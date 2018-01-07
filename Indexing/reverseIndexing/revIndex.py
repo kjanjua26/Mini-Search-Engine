@@ -27,8 +27,8 @@ class HashTable:
 			for val in hitList[key]:
 				docID = val[0]
 				occurence = val[1]
-				temp.append(':'.join([str(docID), ','.join(map(str,occurence))]))
-				inStr = ';'.join(temp)
+				temp.append(':'.join([docID, ','.join(map(str,occurence))]))
+			inStr = ';'.join(temp)
 			myFile.write(key+","+str(inStr)+"\n")
 		myFile.close()
 		
@@ -84,5 +84,5 @@ class HashTable:
 		self.writeFile()
 
 if __name__ == "__main__":
-	invIndex = HashTable("simpleWiki.dat", "grammer.rtf", "simpleWikiData.csv")
+	invIndex = HashTable("sample.dat", "grammer.rtf", "sampleData.csv")
 	invIndex.createhashtable()
