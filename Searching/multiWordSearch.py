@@ -46,6 +46,7 @@ class Search:
         print "The words are in docs: ", ', '.join(self.combine(dList))
 
     def returnRes(self, query):
+        query = query.lower() # lower case the input since all keys are lower case!
         if ' ' in query: # faster than (len(query)>1) since len(query) for longer queries is time taking.
             self.doubleWord(query) 
         elif query.strip(): # checks if the string is not empty!
