@@ -4,12 +4,14 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup as BS
 
 class ForwardIndex:
+    
     def __init__(self):
         pass
 
     hitlist = defaultdict(list)
     corpusFile = "scrappedOut.dat"
     grammerFile = 'grammer.dat'
+    outputFile = "output.file"
     textList = []
     ids = []
 
@@ -19,7 +21,7 @@ class ForwardIndex:
         pageList = []
         print('Reading the corpus...')
         for line in tqdm(corpus):
-            pageList.append(line.strip().lower())  # oomparisons are case sensitive so make all lower
+            pageList.append(line.strip().lower())  # comparisons are case sensitive so make all lower
 
         soup = BS(' '.join(pageList), 'html.parser')
 
@@ -33,8 +35,7 @@ class ForwardIndex:
 
     def cleargrammer(self):
         gFile = open(self.grammerFile, 'r')
-        grammerdoc = [line.strip('\n') for line in
-                      gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
+        grammerdoc = [line.strip('\n') for line in gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
         return grammerdoc
 
     def getkeys(self, textLine):
@@ -49,13 +50,26 @@ class ForwardIndex:
     def forIndex(self):
         self.parse()
         for i in (range(len(self.textList))):
-            pID = self.ids[i]
-            line = self.getkeys(self.textList[i])
-            self.hitlist[pID] = line
+            try:
+                pID = self.ids[i]
+                line = self.getkeys(self.textList[i])
+                self.hitlist[pID] = line
+            except:
+                print "Ops, ID list or Text list busted!"
 
+    def writeFile(self):
+        outFile = open(self.outputFile, 'w')
+        for docID in self.hitlist.iterkeys():
+            inStr = ','.join(self.hitlist[docID]) # joining the list by comma separated.
+            wrtStr = docID + ":" + inStr
+            outFile.write(wrtStr)
+            outFile.write('\n')
+        outFile.close()
+
+    def main(self):
+        self.forIndex()
+        self.writeFile()
 
 if __name__ == '__main__':
     fInd = ForwardIndex()
-    fInd.forIndex()
-    for docID in fInd.hitlist.iterkeys():
-        print "Doc ID: ", docID, " ", "Words: ", fInd.hitlist[docID]
+    fInd.main()
