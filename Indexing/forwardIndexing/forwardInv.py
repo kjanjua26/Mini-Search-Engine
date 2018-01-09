@@ -1,24 +1,38 @@
 import re
 from collections import defaultdict, OrderedDict
-
-grammerFile = 'grammer.dat'
+from tqdm import tqdm
+from bs4 import BeautifulSoup as BS
 
 class ForwardIndex:
     def __init__(self):
         pass
 
     hitlist = defaultdict(list)
-    strArr = ['Hello', 'How are you', 'Kamran Janjua',
-              'Mandela was a great leader. He revolunized the whole South Africa',
-              'I love Mandela, he was a great leader',
-              'Cricket is the best game in England.',
-              'The most important month of the year is April, April is important.',
-              'This string contains duplicates. This string contains duplicates. This string contains DUPLICATES',
-              'ANOTHER TEST DOCUMENT, SEEEEEEEEEEEEH HOW THIS WORKS',
-              'The CPU pushes the Flags Register onto the stack. The CPU pushes a far return address (segment: offset) onto the stack, segment value first. The CPU determines the cause of the interrupt (i.e., the interrupt vector number) and fetches the four byte interrupt vector from address 0:vector*4. The CPU transfers control to the routine specified by the interrupt vector table entry']
+    corpusFile = "scrappedOut.dat"
+    grammerFile = 'grammer.dat'
+    textList = []
+    ids = []
+
+
+    def parse(self):
+        corpus = open(self.corpusFile, 'r')
+        pageList = []
+        print('Reading the corpus...')
+        for line in tqdm(corpus):
+            pageList.append(line.strip().lower())  # oomparisons are case sensitive so make all lower
+
+        soup = BS(' '.join(pageList), 'html.parser')
+
+        print('\nParsing IDs...')
+        for i in tqdm(soup.select('page > id')):
+            self.ids.append(i.text)
+
+        print('\nParsing Text...')
+        for i in tqdm(soup.findAll('text')):
+            self.textList.append(i.text)
 
     def cleargrammer(self):
-        gFile = open(grammerFile, 'r')
+        gFile = open(self.grammerFile, 'r')
         grammerdoc = [line.strip('\n') for line in
                       gFile]  # gets the list of the grammerFile we want to clear, strips the '\n'.
         return grammerdoc
@@ -32,15 +46,16 @@ class ForwardIndex:
         line = list(OrderedDict.fromkeys(line)) #remove duplicates.
         return line
 
-    def main(self):
-        for i in range(len(self.strArr)):
-            line = self.getkeys(self.strArr[i])
-            pID = i+1
+    def forIndex(self):
+        self.parse()
+        for i in (range(len(self.textList))):
+            pID = self.ids[i]
+            line = self.getkeys(self.textList[i])
             self.hitlist[pID] = line
-            print "Done DocID: ", pID
+
 
 if __name__ == '__main__':
     fInd = ForwardIndex()
-    fInd.main()
+    fInd.forIndex()
     for docID in fInd.hitlist.iterkeys():
         print "Doc ID: ", docID, " ", "Words: ", fInd.hitlist[docID]
