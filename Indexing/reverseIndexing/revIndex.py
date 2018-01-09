@@ -31,6 +31,7 @@ class HashTable:
 				temp.append(':'.join([docID, ','.join(map(str,occurence))]))
 			inStr = ';'.join(temp)
 			myFile.write(key+","+str(inStr)+"\n")
+			key = key.lower() # lower to make searching easier
 			pickleTable[key] = inStr
 		myFile.close()
 		
