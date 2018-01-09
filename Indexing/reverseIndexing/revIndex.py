@@ -69,14 +69,14 @@ class HashTable:
 				try:
 					invertedIndex[key][1].append(0)
 				except:
-					invertedIndex[key] = [ids[i], array('I', [0])]  # hashtable[id, [ArrayList]]
+					invertedIndex[key] = [ids[i], array('L', [0])]  # L for unsigned Long -> 4 Bytes, hashtable[id, [ArrayList]]
 
 			keys = self.getKeys(textList[i])
 			for value, key in enumerate(keys):
 				try:
 					invertedIndex[key][1].append(value+1)
 				except:
-					invertedIndex[key] = [ids[i], array('I', [value+1])]  # hashtable[id, [ArrayList]]
+					invertedIndex[key] = [ids[i], array('L', [value+1])]  # L for unsigned Long -> 4 Bytes, hashtable[id, [ArrayList]]
 
 			#for curPage, invPag in invertedIndex.iteritems(): #python 2.7
 			for curPage, invPag in invertedIndex.items(): #python 3.x
