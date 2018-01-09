@@ -9,6 +9,7 @@ hitList = defaultdict(list)
 textList = []
 titles = []
 ids = []
+pickleTable = defaultdict(list)
 
 class HashTable:
 	def __init__(self, source, grammerFile, output):
@@ -30,6 +31,7 @@ class HashTable:
 				temp.append(':'.join([docID, ','.join(map(str,occurence))]))
 			inStr = ';'.join(temp)
 			myFile.write(key+","+str(inStr)+"\n")
+			pickleTable[key] = inStr
 		myFile.close()
 		
 	def getKeys(self, textLine):
@@ -82,7 +84,13 @@ class HashTable:
 			for curPage, invPag in invertedIndex.items(): #python 3.x
 				hitList[curPage].append(invPag)  # updates the defaultdict with each new page.
 		self.writeFile()
+	
+	def pickling(self): # Serializes the hashtable to be read for the searching part.
+		pickleFile = open("self.dumpedDict.pickle", "wb") #opening the pickle file to write the byte stream.
+		pickle.dump(pickleTable, pickleFile)
+		pickleFile.close()
 
 if __name__ == "__main__":
-	invIndex = HashTable("sample.dat", "grammer.rtf", "sampleData.csv")
+	invIndex = HashTable("sample.dat", "grammer.rtf", "sampleData.csv", "dumpedDict.pickle")
 	invIndex.createhashtable()
+	invIndex.pickling()
