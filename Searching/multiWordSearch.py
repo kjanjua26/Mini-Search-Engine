@@ -35,7 +35,7 @@ class Search:
         return set().union(*list) # gets the union of all the lists.
 
     def doubleWord(self, query):
-        dList = []
+        dList = [] # temporary list.
         query = query.split(' ')
         for term in query:
             docs = self.search(term)
@@ -43,7 +43,7 @@ class Search:
                 dList.append([x[0] for x in docs.split(';')]) #gets the docs.
             except:
                 print "\nThe word that isn't in the docs is: ", term
-        print "The words are in docs: ", self.combine(dList)
+        print "The words are in docs: ", ', '.join(self.combine(dList))
 
     def returnRes(self, query):
         if ' ' in query:
