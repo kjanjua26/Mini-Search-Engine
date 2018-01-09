@@ -4,7 +4,7 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup as BS
 
 class ForwardIndex:
-    
+
     def __init__(self):
         pass
 
@@ -59,11 +59,12 @@ class ForwardIndex:
 
     def writeFile(self):
         outFile = open(self.outputFile, 'w')
-        for docID in self.hitlist.iterkeys():
+        for docID in (self.hitlist.iterkeys()):
             inStr = ','.join(self.hitlist[docID]) # joining the list by comma separated.
             wrtStr = docID + ":" + inStr
             outFile.write(wrtStr)
             outFile.write('\n')
+            print "Done DocID: ", docID
         outFile.close()
 
     def main(self):
