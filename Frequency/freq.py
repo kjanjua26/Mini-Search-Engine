@@ -1,18 +1,16 @@
-import re
-import zlib
 from collections import defaultdict
 from matplotlib import pyplot as plt
-from collections import Counter
 from tqdm import tqdm
 from bs4 import BeautifulSoup as BS
 
-wikiFile = '' # wikipedia file.
+wikiFile = 'sample.dat'
 class Freq:
 
     textDict = defaultdict(list)
     myList = list()
     textList = []
     ids = []
+    dic = {}
 
     def __init__(self):
         pass
@@ -36,14 +34,19 @@ class Freq:
 
     def countWords(self):
         self.parse()
-        dic = {}
-        self.myList = [words for segments in self.myList for words in segments.split()]
+
+        self.myList = [words for segments in self.textList for words in segments.split()]
         for x in self.myList:
-            if not x in dic:
-                dic[x] = self.myList.count(x)
-        print dic
-        return dic
+            if not x in self.dic:
+                self.dic[x] = self.myList.count(x)
+        print self.dic
+
+    def plot(self):
+        plt.bar(range(len(self.dic)), list(self.dic.values()), align='center')
+        plt.xticks(range(len(self.dic)), list(self.dic.keys()))
+        plt.show()
 
 if __name__ == '__main__':
     instance = Freq()
     instance.countWords()
+    instance.plot()
